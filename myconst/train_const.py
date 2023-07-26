@@ -1,0 +1,3 @@
+BATCH_SIZE = 128
+LEARNING_RATE = 0.1
+EPOCHES = 20  #default 50
