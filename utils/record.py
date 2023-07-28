@@ -52,11 +52,11 @@ def getGradient(client):
     for j in range(len(g_) - 1):
         line = g_[j].split("\n")
         if j == 0:
-            weights_line = line[0:784]
-            learning_rate_list.append(float(line[784].replace("*", "").replace("\n", "")))
+            weights_line = line[0:DATSETSHAPE]
+            learning_rate_list.append(float(line[DATSETSHAPE].replace("*", "").replace("\n", "")))
         else:
-            weights_line = line[1:785]
-            learning_rate_list.append(float(line[785].replace("*", "").replace("\n", "")))
+            weights_line = line[1:DATSETSHAPE+1]
+            learning_rate_list.append(float(line[DATSETSHAPE+1].replace("*", "").replace("\n", "")))
         valid_weights_line = []
         for l in weights_line:
             w_list = l.split("\t")
@@ -129,7 +129,7 @@ def getHistoryModels():
         if i % 2 == 0:
             lis = line.strip().replace("[", "").replace("]", "").split(",")
             lis = [float(i.strip()) for i in lis]
-            lis = np.array(lis).reshape([784, 10])
+            lis = np.array(lis).reshape([DATSETSHAPE, DATSETLABEL])
             temp_model = [lis]
         else:
             lis = line.strip().replace("[", "").replace("]", "").split(",")

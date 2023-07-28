@@ -34,11 +34,6 @@ sak = SecuredAuthenticationKey(
 session = WolframCloudSession(credentials=sak)
 
 
-
-
-
-
-
 def FedML(nowsubset, recordParams=False, recordModel=False):
     def testAcc(model):
         probY = tf.nn.softmax(
@@ -47,6 +42,11 @@ def FedML(nowsubset, recordParams=False, recordModel=False):
         predY = tf.equal(tf.argmax(probY, 1), tf.argmax(ToOneHot(testY), 1))
         accuracy = tf.reduce_mean(tf.cast(predY, tf.float32))
         return accuracy
+        
+    def testLoss(model):
+        predicted_y = tf.nn.softmax(tf.matmul(testX, model['weights']) + model['bias'])
+        loss = -tf.reduce_mean(tf.reduce_sum(tf.one_hot(testY, DATSETLABEL)*tf.math.log(predicted_y), axis=[1]))
+        return loss
 
     nowSetSize = len(nowsubset)
     print("Now {} clients: {}".format(nowSetSize, nowsubset))
@@ -62,13 +62,15 @@ def FedML(nowsubset, recordParams=False, recordModel=False):
     )
 
     if nowSetSize == 0:
-        accuracy = testAcc(model)
-        print("accuracy:{}".format(accuracy))
-        return accuracy
+        # set metric 1/2
+        metric = testAcc(model)
+        print("accuracy:{}".format(metric))
+        return metric
 
     # prepare the trainDataset of a subset clients
     # subsetTrainBacthData = [batchdata for batchdata in trainBatchData]
     subsetTrainBacthData = [trainBatchData[client] for client in nowsubset]
+
     for _ in range(EPOCHES):
         # get local models of each client
         local_models = federated_train(model, learning_rate, subsetTrainBacthData)
@@ -98,8 +100,8 @@ def FedML(nowsubset, recordParams=False, recordModel=False):
         # loss = federated_eval(model, subsetTrainBacthData)
         # print("Round {}, loss={}".format(_, loss))
 
-    accuracy = testAcc(model)
-    # print("accuracy:{}".format(accuracy))
+    # set metric 2/2
+    metric = testAcc(model)
     return accuracy
 
 
@@ -510,7 +512,6 @@ if __name__ == "__main__":
     expType = sys.argv[1]
     shapType = sys.argv[2]
     testX, testY, trainBatchData = loader(expType)
-
     # import cProfile as cpf
     a_time = time.process_time()
     shapleyCompute(shapType)

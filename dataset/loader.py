@@ -113,64 +113,74 @@ def load_age():
     print("Age Dataset")
     # read All-Age-Faces -- client0  394*309
     print("loading client0 data......")
-    directory_name = "age/All-Age-Faces Dataset/aglined faces"
+    directory_name = "dataset/age/All-Age-Faces Dataset/aglined faces"
     files = os.listdir(r"./" + directory_name)
     D_train, D_test = train_test_split(files, test_size=0.26, random_state=42)
     for filename in D_train:
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        clientTrainX[0].append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        clientTrainX[0].append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         clientTrainY[0].append(int(filename.split('.')[0].split('A')[1]))
     for filename in D_test:
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        testX.append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        testX.append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         testY.append(int(filename.split('.')[0].split('A')[1]))
 
     # read appa-real-release -- client1
     print("loading client1 data......")
-    directory_name = "age/appa-real-release/age_train"
+    directory_name = "dataset/age/appa-real-release/age_train"
     for filename in os.listdir(r"./" + directory_name):
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        clientTrainX[1].append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        clientTrainX[1].append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         clientTrainY[1].append(int(filename.split('_')[0]))
-    directory_name = "age/appa-real-release/age_test"
+    directory_name = "dataset/age/appa-real-release/age_test"
     for filename in os.listdir(r"./" + directory_name):
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        testX.append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        testX.append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         testY.append(int(filename.split('_')[0]))
 
     # read imdb-wiki-dataset -- client2
     print("loading client2 data......")
-    directory_name = "age/imdb-wiki-dataset/train"
+    directory_name = "dataset/age/imdb-wiki-dataset/train"
     for age in os.listdir(r"./" + directory_name):
         for filename in os.listdir(r"./" + directory_name + "/" + age):
             img = cv2.imread(directory_name + "/" + age + "/" + filename)
-            clientTrainX[2].append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+            img = cv2.resize(img, (28, 28))
+            img = img / 255.0
+            clientTrainX[2].append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
             clientTrainY[2].append(int(age))
-    directory_name = "age/imdb-wiki-dataset/test"
+    directory_name = "dataset/age/imdb-wiki-dataset/test"
     for age in os.listdir(r"./" + directory_name):
         for filename in os.listdir(r"./" + directory_name + "/" + age):
             img = cv2.imread(directory_name + "/" + age + "/" + filename)
-            testX.append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+            img = cv2.resize(img, (28, 28))
+            img = img / 255.0
+            testX.append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
             testY.append(int(age))
 
     # read UTKFace -- client3
     print("loading client3 data......")
-    directory_name = "age/UTKFace"
+    directory_name = "dataset/age/UTKFace"
     files = os.listdir(r"./" + directory_name)
     D_train, D_test = train_test_split(files, test_size=0.26, random_state=42)
     for filename in D_train:
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        clientTrainX[3].append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        clientTrainX[3].append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         clientTrainY[3].append(int(filename.split('_')[0]))
     for filename in D_test:
         img = cv2.imread(directory_name + "/" + filename)
-        img = cv2.resize(img, (128, 128))
-        testX.append(img.reshape(img.shape[0], img.shape[1] * img.shape[2]))
+        img = cv2.resize(img, (28, 28))
+        img = img / 255.0
+        testX.append(img.reshape(img.shape[0] * img.shape[1] * img.shape[2]))
         testY.append(int(filename.split('_')[0]))
 
 

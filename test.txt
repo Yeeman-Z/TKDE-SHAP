@@ -1,0 +1,27 @@
+Age Dataset
+loading client0 data......
+loading client1 data......
+loading client2 data......
+loading client3 data......
+data loaded!
+ShapType OR
+Now 4 clients: [0, 1, 2, 3]
+Now 0 clients: []
+accuracy:0.006543137598782778
+Now 1 clients: [0]
+Now 1 clients: [1]
+Now 2 clients: [0, 1]
+Now 1 clients: [2]
+Now 2 clients: [0, 2]
+Now 2 clients: [1, 2]
+Now 3 clients: [0, 1, 2]
+Now 1 clients: [3]
+Now 2 clients: [0, 3]
+Now 2 clients: [1, 3]
+Now 3 clients: [0, 1, 3]
+Now 2 clients: [2, 3]
+Now 3 clients: [0, 2, 3]
+Now 3 clients: [1, 2, 3]
+Now 4 clients: [0, 1, 2, 3]
+Shapley Value of each Client: [0.02064374213417371, 0.022586683432261143, -0.0012048122783501931, 0.026148741443951923]
+SHAP_Time: 126.19937891299998
