@@ -1,2 +1,3 @@
 .idea
 dataset/age/imdb-wiki-dataset/
+utils/*.txt
