@@ -28,10 +28,12 @@ def load_mnist(expType="SAME"):
 
     print("ExpType", expType)
     # testX, testY = [],[]
-    (trainX, trainY), (testX, testY) = tf.keras.datasets.mnist.load_data()
-    trainX, testX = trainX / 255.0, testX / 255.0
+    (trainX, trainY), (testX_m, testY_m) = tf.keras.datasets.mnist.load_data()
+    trainX, testX_m = trainX / 255.0, testX_m / 255.0
     trainX = trainX.reshape((trainX.shape[0], trainX.shape[1] * trainX.shape[2]))
-    testX = testX.reshape((testX.shape[0], testX.shape[1] * testX.shape[2]))
+    testX_m = testX_m.reshape((testX_m.shape[0], testX_m.shape[1] * testX_m.shape[2]))
+    testX.extend(testX_m)
+    testY.extend(testY_m)
 
     # trainSampleNumber = trainX.shape[0]
     setY = set(trainY.reshape(trainY.shape[0]))
@@ -84,7 +86,7 @@ def load_mnist(expType="SAME"):
         # Here clientNumber should be 5*k, e.g. 5, 10, 15...
         if CLIENT_NUM % 5 == 0:
             dis = np.zeros((CLIENT_NUM, DATSETLABEL))
-            sharedRatio = (CLIENT_NUM - 2) / 15.0
+            sharedRatio = (CLIENT_NUM - 6) / 15.0
             for client in range(CLIENT_NUM):
                 for y in range(DATSETLABEL):
                     if y % CLIENT_NUM == client:
@@ -110,6 +112,13 @@ def load_mnist(expType="SAME"):
 
 
 def load_age():
+    '''
+        Summary of AGE DataSet
+        client0 13321 images
+        client1
+        client2
+        client3
+    '''
     print("Age Dataset")
     # read All-Age-Faces -- client0  394*309
     print("loading client0 data......")
@@ -185,16 +194,35 @@ def load_age():
 
 
 def loader(expType="SAME"):
+
+    # create the Train Datasets (#client) and the Test Dataset,
     global testX, testY, clientTrainX, clientTrainY
     testX = []
     testY = []
-    trainBatchData = [[] for _ in range(CLIENT_NUM)]  # 就4个client
-    clientTrainX = [[] for _ in range(CLIENT_NUM)]
+    trainBatchData = [[] for _ in range(CLIENT_NUM)]  # Only 4 clients for the Dataset AGE
+    clientTrainX = [[] for _ in range(CLIENT_NUM)] # e.g, if we have 4 clients --> clientTrainX = [[], [], [], []]
     clientTrainY = [[] for _ in range(CLIENT_NUM)]
+
+    # Choose the datasets by var(DATASET)
     if DATASET == 'AGE':
-        load_age()
+        load_age() # real datasets have been partitioned into 4 clients.
     elif DATASET == 'MNIST':
-        load_mnist(expType)
+        load_mnist(expType) # can be human partitioned.
+        
+    # randomly sample data item by proportion
+    proportion = 1.0
+    for client in range(CLIENT_NUM):
+        client_size = len(clientTrainX[client]) # datasize of each client.
+        client_list = [i for i in range(client_size)] # [0, 1, ..., #]
+        selectList = random.sample(client_list, round(client_size * proportion)) 
+        tempTrainX = []
+        tempTrainY = []
+        for i in selectList:
+            tempTrainX.append(clientTrainX[client][i])  
+            tempTrainY.append(clientTrainY[client][i]) 
+        clientTrainX[client] = tempTrainX
+        clientTrainY[client] = tempTrainY
+
     # create batches for each client with BATCH_SIZE
     for client in range(CLIENT_NUM):
         # print("Now We Create the Client #%d with [%d] train samples" %(client, len(clientTrainX[client])))

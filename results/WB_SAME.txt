@@ -1,0 +1,10 @@
+ExpType SAME
+data loaded!
+ShapType WB
+start calculate!
+Now 0 clients: []
+accuracy:0.09669999778270721
+changes: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+Now 1 clients: [10]
+changes: [[], [], [], [], [], [], [], [], [], [], [0.7555999755859375], [], [], [], []]
+Now 1 clients: [3]

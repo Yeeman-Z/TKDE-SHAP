@@ -22,9 +22,13 @@ from utils.record import recordParamsAndLR, getGradient, clearFile, record_Model
 from myconst.dataset_const import *
 from myconst.train_const import *
 
+# wolframclient calculation
 from wolframclient.evaluation import SecuredAuthenticationKey, WolframCloudSession
 from wolframclient.language import wlexpr
+
+# dataloader
 from dataset.loader import load_mnist, loader
+# HyperParameters
 ROUND_CONVERGE = 5
 CONVERGE_CRITERIA = 0.1
 CONVERGE_UPPER = 80
@@ -32,6 +36,7 @@ sak = SecuredAuthenticationKey(
     'eFyh2bljUDu2bU66hX/5+cQ+fd+AM9BZRwI/ll46lpY=',
     'PqFlaeRrIcm+x8kZ7I2TrWSztz04K3yVE6d7SsbQp28=')
 session = WolframCloudSession(credentials=sak)
+
 
 
 def FedML(nowsubset, recordParams=False, recordModel=False):
@@ -102,7 +107,7 @@ def FedML(nowsubset, recordParams=False, recordModel=False):
 
     # set metric 2/2
     metric = testAcc(model)
-    return accuracy
+    return metric
 
 
 def LOO(CLIENT_NUM):
@@ -452,6 +457,7 @@ def WB_SHAP(CLIENT_NUM):
     SetsOfSize = []
     roundNum = 0
     svChange = [0.0] * 100
+    # changes = [[] for i in range(CLIENT_NUM)]
     for subset in allClientsSet:
         if subsetSize != len(subset) and subsetSize > 0:
             print("start calculate!")
@@ -471,9 +477,11 @@ def WB_SHAP(CLIENT_NUM):
                     delta = delta / scp.comb(CLIENT_NUM - 1, len(ClientsSet) - 1)
                     change += delta
                     shapleyValue[client] = shapleyValue[client] + float(delta)
+                    # changes[client].append(float(delta))
                 svChange.pop(0)
                 svChange.append(change)
                 totalChange += change
+                # print("changes:", changes)
                 if num > 10 and sum(svChange) < ConvergenCecriteria:
                     print(sum(svChange))
                     end_flag = 1
@@ -509,13 +517,13 @@ def shapleyCompute(ShapType):
 
 
 if __name__ == "__main__":
-    expType = sys.argv[1]
-    shapType = sys.argv[2]
-    testX, testY, trainBatchData = loader(expType)
+    expType = sys.argv[1] # Select the  experiment Type, e.g., SAME, VaryDistr, NoiseX, NoiseY
+    shapType = sys.argv[2] # Select the Algorithms, e.g., Def, MR, OR, TMC, GTB ...
+    testX, testY, trainBatchData = loader(expType) # load the input data
     # import cProfile as cpf
     a_time = time.process_time()
     shapleyCompute(shapType)
-    b_time = time.process_time()
+    b_time = time.process_time() # compute the running time of data valuation.
     print("SHAP_Time:", b_time - a_time)
 
 
