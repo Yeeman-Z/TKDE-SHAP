@@ -38,7 +38,7 @@ def load_mnist(expType="SAME"):
     # trainSampleNumber = trainX.shape[0]
     setY = set(trainY.reshape(trainY.shape[0]))
     sampleDictY = dict.fromkeys(setY)
-
+    # Partition the mnist dataset by label SampleDictY[k]-->{id_1, id_x, ..., id_t} with label k
     for i in range(trainX.shape[0]):
         if sampleDictY.get(trainY[i]):
             sampleDictY[trainY[i]].append(i)
@@ -46,7 +46,6 @@ def load_mnist(expType="SAME"):
             sampleDictY[trainY[i]] = [i]
 
     if expType in ["SAME", "NoiseX", "NoiseY"]:
-
         for y in setY:
             dataIndex = sampleDictY[y]
             # print("There is [%d] samples with label %d"%(len(dataIndex), y))
@@ -55,6 +54,7 @@ def load_mnist(expType="SAME"):
                 dataIndex4Client = dataIndex[i * sampleNumber4Client:(i + 1) * sampleNumber4Client]
                 clientTrainX[i].extend([trainX[s] for s in dataIndex4Client])
                 clientTrainY[i].extend([trainY[s] for s in dataIndex4Client])
+
         if expType == "NoiseX":
             noiseRatio = [i * 0.02 for i in range(CLIENT_NUM)]
             # noiseXshape =
@@ -82,17 +82,35 @@ def load_mnist(expType="SAME"):
                 dataIndex4Client = dataIndex[sampleNumber4Client_Begin:sampleNumber4Client_End]
                 clientTrainX[i].extend([trainX[s] for s in dataIndex4Client])
                 clientTrainY[i].extend([trainY[s] for s in dataIndex4Client])
+
     elif expType == "VaryDistr":
         # Here clientNumber should be 5*k, e.g. 5, 10, 15...
         if CLIENT_NUM % 5 == 0:
+            # In this part, we divide this part as main-feature and other-feature,
+            # for main label (MLab) with label-y, it takes 40% of data with label-y
+            # for other label (OLab) with label-y, it takes 60% of data with label-y
+            # each client have 2 MLab and 8 OLab, all client share the data with a specific label
+            # E.g  for scenario with 5 clients,
+            #   client_0: MLab={label-0 (40%) & label-5 (40%)}, OLab={...}
+            #   client_i: MLab={label-k (40%): i%5=k}, OLab={label-j (15%): i%5 neq j}
+            #   client_4: MLab={label-4 (40%), label-9(40%)} OFea={label-1(15%),label-2,label-3,label-5...}
+
+            #E.g   for scenario with 20=5*t clients,
+            #   client_0: MLab={label-0 (10%) & label-5 (10%)}, OLab={...}
+            #   client_i: MLab={label-k (40%/t): i%5=k}, OLab={label-j (60%/t/4): i%5 neq j}
+            #   client_4: MLab={label-4 (10%), label-9(10%)} OLab={label-1(3.75%),label-2,label-3,label-5...}
+
+
             dis = np.zeros((CLIENT_NUM, DATSETLABEL))
-            sharedRatio = (CLIENT_NUM - 6) / 15.0
+            # sharedRatio = (CLIENT_NUM - 6) / 15.0
+            main_label_ratio = 0.4*5/CLIENT_NUM
+            other_label_ratio = 0.6*5/CLIENT_NUM/4
             for client in range(CLIENT_NUM):
                 for y in range(DATSETLABEL):
-                    if y % CLIENT_NUM == client:
-                        dis[client][y] = (1 - sharedRatio)
-                    else:
-                        dis[client][y] = sharedRatio / (CLIENT_NUM - 1)
+                    if (client % 5) == (y % 5): # label_y = CLIENT_NUM % 5 --> Main-Label
+                        dis[client][y] = main_label_ratio
+                    else: # Other-Label
+                        dis[client][y] = other_label_ratio
             # print(dis)
             for y in setY:
                 dataIndex = sampleDictY[y]
@@ -115,9 +133,9 @@ def load_age():
     '''
         Summary of AGE DataSet
         client0 13321 images
-        client1
-        client2
-        client3
+        client1 TODO
+        client2 TODO 
+        client3 TODO
     '''
     print("Age Dataset")
     # read All-Age-Faces -- client0  394*309
