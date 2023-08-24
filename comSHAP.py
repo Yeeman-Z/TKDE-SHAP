@@ -457,7 +457,7 @@ def WB_SHAP(CLIENT_NUM):
     SetsOfSize = []
     roundNum = 0
     svChange = [0.0] * 100
-    # changes = [[] for i in range(CLIENT_NUM)]
+    changes = [[] for i in range(CLIENT_NUM)]
     for subset in allClientsSet:
         if subsetSize != len(subset) and subsetSize > 0:
             print("start calculate!")
@@ -477,19 +477,19 @@ def WB_SHAP(CLIENT_NUM):
                     delta = delta / scp.comb(CLIENT_NUM - 1, len(ClientsSet) - 1)
                     change += delta
                     shapleyValue[client] = shapleyValue[client] + float(delta)
-                    # changes[client].append(float(delta))
+                    changes[client].append(float(delta))
                 svChange.pop(0)
                 svChange.append(change)
                 totalChange += change
-                # print("changes:", changes)
-                if num > 10 and sum(svChange) < ConvergenCecriteria:
-                    print(sum(svChange))
-                    end_flag = 1
-                    break
+                print("changes:", changes)
+#                if num > 10 and sum(svChange) < ConvergenCecriteria:
+#                    print(sum(svChange))
+#                    end_flag = 1
+#                    break
             SetsOfSize = []
             print("Shapley Value of each Client:", shapleyValue)
-            if totalChange < ConvergenCecriteria or end_flag or roundNum > 1000:
-                break
+#            if totalChange < ConvergenCecriteria or end_flag or roundNum > 1000:
+#                break
         subsetSize = len(subset)
         roundNum += 1
         SetsOfSize.append(subset)
