@@ -7,6 +7,7 @@ import collections
 import copy
 import itertools
 import cv2
+import tensorflow_federated as tff
 from sklearn.model_selection import train_test_split
 
 import scipy.special as scp
@@ -44,7 +45,7 @@ def load_mnist(expType="SAME"):
             sampleDictY[trainY[i]].append(i)
         else:
             sampleDictY[trainY[i]] = [i]
-
+    # clientTrainX, clientTrainY = [[] for i in range(CLIENT_NUM)], [[] for i in range(CLIENT_NUM)]
     if expType in ["SAME", "NoiseX", "NoiseY"]:
         for y in setY:
             dataIndex = sampleDictY[y]
@@ -127,7 +128,7 @@ def load_mnist(expType="SAME"):
         else:
             print("The clientNumber={} is wrong!".format(CLIENT_NUM))
             pass
-
+    # return testX, testY, trainBatchData
 
 def load_age():
     '''
@@ -211,6 +212,9 @@ def load_age():
         testY.append(int(filename.split('_')[0]))
 
 
+def load_FEMNIST():
+    pass
+
 def loader(expType="SAME"):
 
     # create the Train Datasets (#client) and the Test Dataset,
@@ -249,5 +253,5 @@ def loader(expType="SAME"):
                 "x": np.array(clientTrainX[client][i:i + BATCH_SIZE], dtype=np.float32),
                 "y": np.array(clientTrainY[client][i:i + BATCH_SIZE], dtype=np.int32)
             })
-    print("data loaded!")
+    # print("data loaded!")
     return testX, testY, trainBatchData

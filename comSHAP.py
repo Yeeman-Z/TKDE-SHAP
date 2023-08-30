@@ -32,10 +32,10 @@ from dataset.loader import load_mnist, loader
 ROUND_CONVERGE = 5
 CONVERGE_CRITERIA = 0.1
 CONVERGE_UPPER = 80
-sak = SecuredAuthenticationKey(
-    'eFyh2bljUDu2bU66hX/5+cQ+fd+AM9BZRwI/ll46lpY=',
-    'PqFlaeRrIcm+x8kZ7I2TrWSztz04K3yVE6d7SsbQp28=')
-session = WolframCloudSession(credentials=sak)
+# sak = SecuredAuthenticationKey(
+#     'eFyh2bljUDu2bU66hX/5+cQ+fd+AM9BZRwI/ll46lpY=',
+#     'PqFlaeRrIcm+x8kZ7I2TrWSztz04K3yVE6d7SsbQp28=')
+# session = WolframCloudSession(credentials=sak)
 
 
 
@@ -520,6 +520,7 @@ if __name__ == "__main__":
     expType = sys.argv[1] # Select the  experiment Type, e.g., SAME, VaryDistr, NoiseX, NoiseY
     shapType = sys.argv[2] # Select the Algorithms, e.g., Def, MR, OR, TMC, GTB ...
     testX, testY, trainBatchData = loader(expType) # load the input data
+    # print(len(testX), len(testY), len(trainBatchData))
     # import cProfile as cpf
     a_time = time.process_time()
     shapleyCompute(shapType)
