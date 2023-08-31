@@ -1,14 +1,32 @@
 syntax = "proto3";
+// package rpc_package;
 
 
 service  greeter{
     rpc say_hello (hello_request) returns (hello_reply) {}
 }
 
+
+service stop_server{
+    rpc stop (stop_request) returns (stop_reply){}
+}
 message hello_request {
-    string name=1;
+    // string name=1;
+    repeated bytes npdata=1;
+    repeated string nptypes=2;
+    repeated string npshape=3;
 }
 
 message hello_reply{
+    // repeated int32 np_test=1;
+    string message=1;
+    repeated bytes np_test=2;
+}
+
+message stop_request{
+    string message=1;
+}
+
+message stop_reply{
     string message=1;
 }

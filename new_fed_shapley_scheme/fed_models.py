@@ -6,6 +6,9 @@ CLINT_NUM = 2
 BASIC_PORT = 50020
 FED_ROUND = 10
 DATA_SHAPE = (28*28, 10)
+LOCAL_EPOCH = 10
+LOCAL_BATCH = 30
+
 
 def nparray_to_rpcio(nparray):
     byte_array_data = [x.tobytes() for x in nparray]

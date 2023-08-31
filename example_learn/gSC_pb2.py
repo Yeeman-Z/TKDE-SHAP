@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\tgSC.proto\"\x1d\n\rhello_request\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1e\n\x0bhello_reply\x12\x0f\n\x07message\x18\x01 \x01(\t26\n\x07greeter\x12+\n\tsay_hello\x12\x0e.hello_request\x1a\x0c.hello_reply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\tgSC.proto\"A\n\rhello_request\x12\x0e\n\x06npdata\x18\x01 \x03(\x0c\x12\x0f\n\x07nptypes\x18\x02 \x03(\t\x12\x0f\n\x07npshape\x18\x03 \x03(\t\"/\n\x0bhello_reply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0f\n\x07np_test\x18\x02 \x03(\x0c\"\x1f\n\x0cstop_request\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1d\n\nstop_reply\x12\x0f\n\x07message\x18\x01 \x01(\t26\n\x07greeter\x12+\n\tsay_hello\x12\x0e.hello_request\x1a\x0c.hello_reply\"\x00\x32\x33\n\x0bstop_server\x12$\n\x04stop\x12\r.stop_request\x1a\x0b.stop_reply\"\x00\x62\x06proto3'
 )
 
 
@@ -34,9 +34,23 @@ _HELLO_REQUEST = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='hello_request.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='npdata', full_name='hello_request.npdata', index=0,
+      number=1, type=12, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='nptypes', full_name='hello_request.nptypes', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='npshape', full_name='hello_request.npshape', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -53,7 +67,7 @@ _HELLO_REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=13,
-  serialized_end=42,
+  serialized_end=78,
 )
 
 
@@ -72,6 +86,13 @@ _HELLO_REPLY = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='np_test', full_name='hello_reply.np_test', index=1,
+      number=2, type=12, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -84,12 +105,78 @@ _HELLO_REPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=44,
-  serialized_end=74,
+  serialized_start=80,
+  serialized_end=127,
+)
+
+
+_STOP_REQUEST = _descriptor.Descriptor(
+  name='stop_request',
+  full_name='stop_request',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='message', full_name='stop_request.message', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=129,
+  serialized_end=160,
+)
+
+
+_STOP_REPLY = _descriptor.Descriptor(
+  name='stop_reply',
+  full_name='stop_reply',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='message', full_name='stop_reply.message', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=162,
+  serialized_end=191,
 )
 
 DESCRIPTOR.message_types_by_name['hello_request'] = _HELLO_REQUEST
 DESCRIPTOR.message_types_by_name['hello_reply'] = _HELLO_REPLY
+DESCRIPTOR.message_types_by_name['stop_request'] = _STOP_REQUEST
+DESCRIPTOR.message_types_by_name['stop_reply'] = _STOP_REPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 hello_request = _reflection.GeneratedProtocolMessageType('hello_request', (_message.Message,), {
@@ -106,6 +193,20 @@ hello_reply = _reflection.GeneratedProtocolMessageType('hello_reply', (_message.
   })
 _sym_db.RegisterMessage(hello_reply)
 
+stop_request = _reflection.GeneratedProtocolMessageType('stop_request', (_message.Message,), {
+  'DESCRIPTOR' : _STOP_REQUEST,
+  '__module__' : 'gSC_pb2'
+  # @@protoc_insertion_point(class_scope:stop_request)
+  })
+_sym_db.RegisterMessage(stop_request)
+
+stop_reply = _reflection.GeneratedProtocolMessageType('stop_reply', (_message.Message,), {
+  'DESCRIPTOR' : _STOP_REPLY,
+  '__module__' : 'gSC_pb2'
+  # @@protoc_insertion_point(class_scope:stop_reply)
+  })
+_sym_db.RegisterMessage(stop_reply)
+
 
 
 _GREETER = _descriptor.ServiceDescriptor(
@@ -115,8 +216,8 @@ _GREETER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=76,
-  serialized_end=130,
+  serialized_start=193,
+  serialized_end=247,
   methods=[
   _descriptor.MethodDescriptor(
     name='say_hello',
@@ -132,5 +233,31 @@ _GREETER = _descriptor.ServiceDescriptor(
 _sym_db.RegisterServiceDescriptor(_GREETER)
 
 DESCRIPTOR.services_by_name['greeter'] = _GREETER
+
+
+_STOP_SERVER = _descriptor.ServiceDescriptor(
+  name='stop_server',
+  full_name='stop_server',
+  file=DESCRIPTOR,
+  index=1,
+  serialized_options=None,
+  create_key=_descriptor._internal_create_key,
+  serialized_start=249,
+  serialized_end=300,
+  methods=[
+  _descriptor.MethodDescriptor(
+    name='stop',
+    full_name='stop_server.stop',
+    index=0,
+    containing_service=None,
+    input_type=_STOP_REQUEST,
+    output_type=_STOP_REPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+])
+_sym_db.RegisterServiceDescriptor(_STOP_SERVER)
+
+DESCRIPTOR.services_by_name['stop_server'] = _STOP_SERVER
 
 # @@protoc_insertion_point(module_scope)
