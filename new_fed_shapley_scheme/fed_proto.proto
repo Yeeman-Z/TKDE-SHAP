@@ -3,7 +3,7 @@ syntax = "proto3";
 package rpc_package;
 
 service GradDescentService{
-    rpc grad_decent (server_request) returns (client_reply) {}
+    rpc grad_descent (server_request) returns (client_reply) {}
 }
 
 service GetDataSizeService{

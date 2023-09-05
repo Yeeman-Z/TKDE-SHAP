@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x66\x65\x64_proto.proto\x12\x0brpc_package\"n\n\x0eserver_request\x12\x1d\n\x15server_grad_para_data\x18\x01 \x03(\x0c\x12\x1d\n\x15server_grad_para_type\x18\x02 \x03(\t\x12\x1e\n\x16server_grad_para_shape\x18\x03 \x03(\t\"l\n\x0c\x63lient_reply\x12\x1d\n\x15\x63lient_grad_para_data\x18\x01 \x03(\x0c\x12\x1d\n\x15\x63lient_grad_para_type\x18\x02 \x03(\t\x12\x1e\n\x16\x63lient_grad_para_shape\x18\x03 \x03(\t\" \n\x10\x64\x61tasize_request\x12\x0c\n\x04size\x18\x01 \x01(\x05\"\x1e\n\x0e\x64\x61tasize_reply\x12\x0c\n\x04size\x18\x01 \x01(\x05\"\x1f\n\x0cstop_request\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1d\n\nstop_reply\x12\x0f\n\x07message\x18\x01 \x01(\t2]\n\x12GradDescentService\x12G\n\x0bgrad_decent\x12\x1b.rpc_package.server_request\x1a\x19.rpc_package.client_reply\"\x00\x32\x62\n\x12GetDataSizeService\x12L\n\x0cget_datasize\x12\x1d.rpc_package.datasize_request\x1a\x1b.rpc_package.datasize_reply\"\x00\x32K\n\x0bstop_server\x12<\n\x04stop\x12\x19.rpc_package.stop_request\x1a\x17.rpc_package.stop_reply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0f\x66\x65\x64_proto.proto\x12\x0brpc_package\"n\n\x0eserver_request\x12\x1d\n\x15server_grad_para_data\x18\x01 \x03(\x0c\x12\x1d\n\x15server_grad_para_type\x18\x02 \x03(\t\x12\x1e\n\x16server_grad_para_shape\x18\x03 \x03(\t\"l\n\x0c\x63lient_reply\x12\x1d\n\x15\x63lient_grad_para_data\x18\x01 \x03(\x0c\x12\x1d\n\x15\x63lient_grad_para_type\x18\x02 \x03(\t\x12\x1e\n\x16\x63lient_grad_para_shape\x18\x03 \x03(\t\" \n\x10\x64\x61tasize_request\x12\x0c\n\x04size\x18\x01 \x01(\x05\"\x1e\n\x0e\x64\x61tasize_reply\x12\x0c\n\x04size\x18\x01 \x01(\x05\"\x1f\n\x0cstop_request\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1d\n\nstop_reply\x12\x0f\n\x07message\x18\x01 \x01(\t2^\n\x12GradDescentService\x12H\n\x0cgrad_descent\x12\x1b.rpc_package.server_request\x1a\x19.rpc_package.client_reply\"\x00\x32\x62\n\x12GetDataSizeService\x12L\n\x0cget_datasize\x12\x1d.rpc_package.datasize_request\x1a\x1b.rpc_package.datasize_reply\"\x00\x32K\n\x0bstop_server\x12<\n\x04stop\x12\x19.rpc_package.stop_request\x1a\x17.rpc_package.stop_reply\"\x00\x62\x06proto3'
 )
 
 
@@ -304,11 +304,11 @@ _GRADDESCENTSERVICE = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=384,
-  serialized_end=477,
+  serialized_end=478,
   methods=[
   _descriptor.MethodDescriptor(
-    name='grad_decent',
-    full_name='rpc_package.GradDescentService.grad_decent',
+    name='grad_descent',
+    full_name='rpc_package.GradDescentService.grad_descent',
     index=0,
     containing_service=None,
     input_type=_SERVER_REQUEST,
@@ -329,8 +329,8 @@ _GETDATASIZESERVICE = _descriptor.ServiceDescriptor(
   index=1,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=479,
-  serialized_end=577,
+  serialized_start=480,
+  serialized_end=578,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_datasize',
@@ -355,8 +355,8 @@ _STOP_SERVER = _descriptor.ServiceDescriptor(
   index=2,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=579,
-  serialized_end=654,
+  serialized_start=580,
+  serialized_end=655,
   methods=[
   _descriptor.MethodDescriptor(
     name='stop',

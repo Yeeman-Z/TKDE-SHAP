@@ -2,12 +2,13 @@ import tensorflow as tf
 import numpy as np
 
 
-CLINT_NUM = 2
+CLINT_NUM = 5
 BASIC_PORT = 50020
+STOP_PORT =  50081
 FED_ROUND = 10
-DATA_SHAPE = (28*28, 10)
-LOCAL_EPOCH = 10
-LOCAL_BATCH = 30
+DATA_SHAPE = ((28,28), 10)
+LOCAL_EPOCH = 5
+LOCAL_BATCH = 120
 
 
 def nparray_to_rpcio(nparray):
@@ -25,21 +26,29 @@ def rpcio_to_nparray(byte_data, byte_type, byte_shape):
 class linear_model():
 
     def __init__(self, _input, _output):
-        self.input  = _input
-        self.output = _output
-        self.model = tf.keras.Sequential(
-            tf.keras.Input(shape=_input),
-            tf.keras.layers.Dense(128, activation='relu'),
-            tf.keras.layers.Dense(128, activation='relu'),
-            tf.keras.layers.Dense(_output),
-        )
 
+        print("Now we are creating Linear Model with input={}, output={}".format(_input,_output))
+        self.input  = _input
+        # self.output = _output
+        self.model = tf.keras.models.Sequential([
+            # tf.keras.Input(shape=_input),
+            tf.keras.layers.Flatten(input_shape=_input),
+            # tf.keras.layers.Dense(128, activation='relu'),
+            # tf.keras.layers.Dense(128, activation='relu'),
+            # tf.keras.layers.Dense(_output),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(10)
+        ])
+        # self.model.summary()
         self.model_compile()
 
     
     def model_compile(self):
         self.model.compile(optimizer="adam", 
-            losses=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=['accuracy'])
     
     def model_fit(self, _datasets, _local_epoches, _batchsize):

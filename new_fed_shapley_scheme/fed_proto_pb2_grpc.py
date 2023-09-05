@@ -14,8 +14,8 @@ class GradDescentServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.grad_decent = channel.unary_unary(
-                '/rpc_package.GradDescentService/grad_decent',
+        self.grad_descent = channel.unary_unary(
+                '/rpc_package.GradDescentService/grad_descent',
                 request_serializer=fed__proto__pb2.server_request.SerializeToString,
                 response_deserializer=fed__proto__pb2.client_reply.FromString,
                 )
@@ -24,7 +24,7 @@ class GradDescentServiceStub(object):
 class GradDescentServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def grad_decent(self, request, context):
+    def grad_descent(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -33,8 +33,8 @@ class GradDescentServiceServicer(object):
 
 def add_GradDescentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'grad_decent': grpc.unary_unary_rpc_method_handler(
-                    servicer.grad_decent,
+            'grad_descent': grpc.unary_unary_rpc_method_handler(
+                    servicer.grad_descent,
                     request_deserializer=fed__proto__pb2.server_request.FromString,
                     response_serializer=fed__proto__pb2.client_reply.SerializeToString,
             ),
@@ -49,7 +49,7 @@ class GradDescentService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def grad_decent(request,
+    def grad_descent(request,
             target,
             options=(),
             channel_credentials=None,
@@ -59,7 +59,7 @@ class GradDescentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/rpc_package.GradDescentService/grad_decent',
+        return grpc.experimental.unary_unary(request, target, '/rpc_package.GradDescentService/grad_descent',
             fed__proto__pb2.server_request.SerializeToString,
             fed__proto__pb2.client_reply.FromString,
             options, channel_credentials,
