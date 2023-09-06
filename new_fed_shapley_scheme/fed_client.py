@@ -4,8 +4,11 @@ import fed_proto_pb2_grpc
 import grpc
 from concurrent import futures
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from fed_models import rpcio_to_nparray, nparray_to_rpcio
-from fed_models import linear_model as LM
+# from fed_models import *
 from fed_models import *
 import tensorflow_federated as tff
 
@@ -15,8 +18,9 @@ import pickle as pk
 import tensorflow as tf
 import time
 SERVE_STOP_FLAG = False 
-
 OUPUT_INFO = True
+
+# fed_model = cnn_model
 # import 
 
 gpu_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -36,7 +40,7 @@ class datasize_servicier(fed_proto_pb2_grpc.GetDataSizeServiceServicer):
 class grad_descent_servicer(fed_proto_pb2_grpc.GradDescentServiceServicer):
     def __init__(self, _dataset, _cid):
         self.dataset = _dataset
-        self.model = LM(DATA_SHAPE[0], DATA_SHAPE[1])
+        self.model = FED_MODEL(DATA_SHAPE[0], DATA_SHAPE[1])
         self.cid = _cid
 
     def grad_descent(self, request, context):
