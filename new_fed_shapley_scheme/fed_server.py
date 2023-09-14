@@ -2,6 +2,11 @@ import logging
 import fed_proto_pb2
 import fed_proto_pb2_grpc
 import grpc
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+
 from fed_models import rpcio_to_nparray, nparray_to_rpcio
 from fed_models import *
 import matplotlib.pyplot as plt
