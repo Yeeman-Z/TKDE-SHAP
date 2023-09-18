@@ -64,18 +64,19 @@ print(x_train.shape, y_train.shape)
 #         tf.keras.layers.Dense(10,)
 # ])
 
+
 model = tf.keras.models.Sequential([
             tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
-            tf.keras.layers.Conv2D(16, (3,3), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
-            tf.keras.layers.MaxPooling2D((2,2), name='Pool2D-2x2'),   # (14,14,32)
-            tf.keras.layers.Conv2D(32, (2,2),padding='same', activation='relu'), #(14,14,64)
-            tf.keras.layers.MaxPooling2D((2,2)), #[7, 7, 64]
-            # tf.keras.layers.Conv2D(64, (3, 3), activation='relu'), #(5,5,64)
+            tf.keras.layers.Conv2D(32, (8,8), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
+            tf.keras.layers.MaxPooling2D((8,8), name='Pool2D-2x2'),   # (14,14,32)
+            # tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), #(14,14,64)
+            # tf.keras.layers.MaxPooling2D((2,2)), #[7, 7, 64]
             tf.keras.layers.Flatten(), #5*5*64
-            tf.keras.layers.Dense(64, activation='relu'),
+            tf.keras.layers.Dense(16, activation='relu'),
             tf.keras.layers.Dense(10,)
         ])
 
+        # self.model.summary()
 
 model.summary()
 
@@ -86,5 +87,5 @@ model.compile(optimizer='adam',
               loss=loss_fn,
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, batch_size=32000, epochs=20)
+model.fit(x_train, y_train, batch_size=10200, epochs=2)
 model.evaluate(x_test,  y_test, verbose=2)

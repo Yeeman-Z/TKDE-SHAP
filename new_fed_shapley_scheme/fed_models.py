@@ -9,13 +9,12 @@ CLINT_NUM = 5
 BASIC_PORT = 50020
 STOP_PORT =  50081
 FED_ROUND = 100
-DATA_SHAPE = ((28,28), 10)
+# DATA_SHAPE = 
 LOCAL_EPOCH = 5
 LOCAL_BATCH = 64
 
-LOCAL_MINI_FLAG = False
-LOCAL_MINI_BATCH_SIZE = 4000
-LOCAL_MINI_EPOCH = 1
+
+FED_SHAPE_DICT = {"emnist":((28,28), 10),}
 
 
 def nparray_to_rpcio(nparray):
@@ -25,7 +24,7 @@ def nparray_to_rpcio(nparray):
     return byte_array_data, byte_array_type, byte_array_shape 
 
 def rpcio_to_nparray(byte_data, byte_type, byte_shape):
-    # request.
+
     return [np.frombuffer(data, dtype=np.dtype(rtype)).reshape(eval(shape)) 
             for data,rtype,shape in zip(byte_data, byte_type, byte_shape)]
 
@@ -34,11 +33,11 @@ class basic_model():
 
     def __init__(self, _input, _output, _type):
 
-        self.local_mini_flag = LOCAL_MINI_FLAG
-        self.local_mini_batch_size = LOCAL_MINI_BATCH_SIZE
-        self.local_mini_epoch = LOCAL_MINI_EPOCH
+        # self.local_mini_flag = LOCAL_MINI_FLAG
+        # self.local_mini_batch_size = LOCAL_MINI_BATCH_SIZE
+        # self.local_mini_epoch = LOCAL_MINI_EPOCH
         print("Now we are creating {} with input={}, output={}".format(_type, _input,_output))
-        print("Local_Mini_Batch is {}, with Mini_Size is {}".format(self.local_mini_flag, self.local_mini_batch_size))
+        # print("Local_Mini_Batch is {}, with Mini_Size is {}".format(self.local_mini_flag, self.local_mini_batch_size))
         # pass
         # self.input  = _input
         # # self.output = _output
@@ -51,16 +50,14 @@ class basic_model():
             metrics=['accuracy'])
     
     def model_fit(self, _datasets, _local_epoches, _batchsize):
-        if not self.local_mini_flag:
-            self.model.fit(_datasets[0], _datasets[1], batch_size=_batchsize, epochs=_local_epoches)
-        else:
-            ids = np.random.choice(np.array(range(len(_datasets[1]))),size=self.local_mini_batch_size, replace=False)
-            mini_datasets = (_datasets[0][ids], _datasets[1][ids])
-            # print("ids:", ids, '\n', "labels:", mini_datasets[1])
-            self.model.fit(mini_datasets[0], mini_datasets[1], batch_size=self.local_mini_batch_size, epochs=self.local_mini_epoch)
+        # if not self.local_mini_flag:
+        self.model.fit(_datasets[0], _datasets[1], batch_size=_batchsize, epochs=_local_epoches)
+        # else:
+        #     ids = np.random.choice(np.array(range(len(_datasets[1]))),size=self.local_mini_batch_size, replace=False)
+        #     mini_datasets = (_datasets[0][ids], _datasets[1][ids])
+        #     # print("ids:", ids, '\n', "labels:", mini_datasets[1])
+        #     self.model.fit(mini_datasets[0], mini_datasets[1], batch_size=self.local_mini_batch_size, epochs=self.local_mini_epoch)
 
-
-    
 
     def model_load_weights(self, _weights):
         self.model.set_weights(_weights)
@@ -121,10 +118,6 @@ class cnn_model(basic_model):
         #     tf.keras.layers.Dense(10,)
         # ])
 
-        # self.model.summary()
         self.model_compile() 
 
-
-
-
-FED_MODEL = cnn_model
+FED_MODEL_DICT = {"cnn_model":cnn_model, "linear_model": linear_model}

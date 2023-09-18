@@ -2,15 +2,18 @@ import logging
 import fed_proto_pb2
 import fed_proto_pb2_grpc
 import grpc
+import time
 
 import os
+import argparse as ap  
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 from fed_models import rpcio_to_nparray, nparray_to_rpcio
 from fed_models import *
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D as mp3d
+from helper_shap import *
+# import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D as mp3d
 
 import numpy as np
 import pickle as pk
@@ -19,13 +22,15 @@ gpu_devices = tf.config.experimental.list_physical_devices('GPU')
 for device in gpu_devices:
     tf.config.experimental.set_memory_growth(device, True)
 
-# fed_model = cnn_model
-
 # class call_grad_descent_from_client(fed_proto_pb2_grpc.GradDescentServiceServicer):
 # here the fed_server calls the remote function of clients.
 # _clients = [(c_id, *), (), ...]
-def run_fed_server(_clients=CLINT_NUM, _basic_port=BASIC_PORT):
+def run_fed_server(_args, _basic_port=BASIC_PORT):
 
+    # load the parameters of FL
+    _clients = _args.client_num
+    FED_MODEL = FED_MODEL_DICT[_args.model]
+    
     # build the channel to each client to execute the local trainning.
     ports = [c+_basic_port for c in range(_clients)]  
     c_num = _clients 
@@ -44,6 +49,7 @@ def run_fed_server(_clients=CLINT_NUM, _basic_port=BASIC_PORT):
 
     # Globally train the federated model, i.e. execute the stub.grad_decendent
     print("# Globally train the federated model, i.e. execute the stub.grad_decendent.")
+    DATA_SHAPE = FED_SHAPE_DICT[_args.dataset]
     global_model = FED_MODEL(DATA_SHAPE[0], DATA_SHAPE[1])
     global_model_weights = global_model.model_get_weights()
     datasize_response = [size_stubs[c].get_datasize(fed_proto_pb2.datasize_request(size=0)) for c in range(c_num)]
@@ -83,15 +89,30 @@ def run_fed_server(_clients=CLINT_NUM, _basic_port=BASIC_PORT):
         test_loss, test_acc = global_model.model_get_eval(testX, testY)
         print("Round#{}#, Acc:{}, Loss:{}".format(r, test_acc, test_loss))
 
-        # print("-------------------------------------------------------------------")
-        
-        # print("-------------------------------------------------------------------")
-
     
     stop_stus = fed_proto_pb2_grpc.stop_serverStub(grpc.insecure_channel("localhost:"+str(STOP_PORT)))
     stop_stus.stop(fed_proto_pb2.stop_request(message="simplex"))
 
 if __name__ == "__main__":
     logging.basicConfig()
-    # load_data
-    run_fed_server()
+
+    # load parameter of run_fed_server
+    parser = ap.ArgumentParser(description="Creating Info. for Comp. Shapley.")
+    parser.add_argument("--model", type=str, default='linear')
+    parser.add_argument("--client_num", type=int, default=5)
+    parser.add_argument("--dataset", type=str, default="emnist")
+    parser.add_argument("--rec_sample", type=str, default=str([i for i in range(5)]))
+    args = parser.parse_args()
+
+    # run the server in FL & record the running time of FL
+    begin_time = time.perf_counter()
+    run_fed_server(args)
+    end_time = time.perf_counter()
+
+
+    # record the time of this sample in FL
+    file_name_rec_grad = "./rec_fed_sample_time/" + get_rec_file_name(args.model, args.client_num, args.dataset)
+    now_rec = pk.load(file_name_rec_grad)
+    now_rec[str(power2number(args.rec_sample))] = end_time - begin_time
+    with open(file_name_rec_grad, 'wb') as fout:
+        pk.dump(now_rec, fout)

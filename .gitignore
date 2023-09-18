@@ -2,4 +2,7 @@
 dataset/age/*
 utils/*.txt
 fig/*
-new_fed_shapley_scheme/datasets/*
+new_fed_shapley_scheme/datasets/emnist/*
+new_fed_shapley_scheme/datasets/figs/*
+new_fed_shapley_scheme/datasets/grad_data/*
+new_fed_shapley_scheme/datasets/sample_data/*
