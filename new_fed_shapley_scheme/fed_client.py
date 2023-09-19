@@ -41,9 +41,9 @@ class grad_descent_servicer(fed_proto_pb2_grpc.GradDescentServiceServicer):
         data_shape = FED_SHAPE_DICT[_args.dataset]
         self.model = _model(data_shape[0], data_shape[1])
         self.cid = _cid
-        self.local_round = _args.few_round
+        self.local_round = _args.local_round
         self.rec_grad = _args.rec_grad
-        self.local_batch = 64
+        self.local_batch = 32
         self.global_round = 0 # record the global round we are in.
         self.args = _args
 
@@ -62,7 +62,9 @@ class grad_descent_servicer(fed_proto_pb2_grpc.GradDescentServiceServicer):
         client_model_weights = self.model.model_get_weights()
         
         # Record the grad of this client
-        rec_grad(global_model_weights, client_model_weights, self.cid, self.global_round, self.args)
+        print("Now rec_grad is {}".format(self.rec_grad))
+        if self.rec_grad:
+            rec_grad(global_model_weights, client_model_weights, self.cid, self.global_round, self.args)
         self.global_round += 1
 
         # reply the updates model by grpc (np.array-->rpcio)
@@ -86,8 +88,7 @@ class stop_server(fed_proto_pb2_grpc.stop_serverServicer):
         return fed_proto_pb2.stop_reply(message="The client %d has been stopped!" % (self.cid))
 
 def run_fed_client(cid, client_dataset, _args):
-    # stop_event = threading.Event()
-    # print(stop_event)
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     fed_proto_pb2_grpc.add_GetDataSizeServiceServicer_to_server(datasize_servicier(client_dataset, cid), server)
     fed_proto_pb2_grpc.add_GradDescentServiceServicer_to_server(grad_descent_servicer(FED_MODEL_DICT[_args.model], client_dataset, cid, _args), server)
@@ -95,11 +96,10 @@ def run_fed_client(cid, client_dataset, _args):
 
     print("Rpc_Client_{} is created.".format(cid))
     server.start()
+    
     while not SERVE_STOP_FLAG:
         time.sleep(60)
         print("Client %d is still running" % (cid))
-    
-    # stop_event.wait()
     print("The client {} have been stoped. ".format(cid))
 
 def stop_fed_client():
@@ -113,6 +113,7 @@ def stop_fed_client():
 
 def create_client_threads(_args):
     _c_num= _args.client_num
+    _sample_client = eval(_args.rec_sample)
 
     # prepare the dataset for each client
     data_path = "./datasets/"+ _args.dataset + "/client_"+ str(_c_num) + "_same/"
@@ -125,8 +126,11 @@ def create_client_threads(_args):
         print("Loaded Trainning Dataset for {} clients.".format(_c_num))
 
     # create threads for each client
-    client_threads = [threading.Thread(target=run_fed_client, name="fed_client_"+str(cid), 
-                    args=(cid, (client_trainX[cid], client_trainY[cid]), _args), daemon=True) for cid in range(_c_num)]
+    client_threads = []
+    for cid in range(_c_num):
+        if cid in _sample_client:
+            client_threads.append(threading.Thread(target=run_fed_client, name="fed_client_"+str(cid), 
+                    args=(cid, (client_trainX[cid], client_trainY[cid]), _args), daemon=True))
     
     # if OUPUT_INFO:
     #     print("Loaded Trainning Dataset for {} clients.".format(_c_num)) 
@@ -146,9 +150,11 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, default='linear')
     parser.add_argument("--client_num", type=int, default=5)
     parser.add_argument("--dataset", type=str, default="emnist")
-    parser.add_argument("--few_round", type=int, default=5)
+    parser.add_argument("--local_round", type=int, default=5)
     parser.add_argument("--rec_grad", type=bool, default=False)
-    parser.add_argument("--rec_sample", type=bool, default=False)
+    parser.add_argument("--rec_sample", type=str, default=str([i for i in range(5)]))
+
+    # parser.add_argument("--rec_sample", type=bool, default=False)
     args = parser.parse_args()
     logging.basicConfig()
 

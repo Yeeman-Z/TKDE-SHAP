@@ -3,6 +3,7 @@ import fed_proto_pb2
 import fed_proto_pb2_grpc
 import grpc
 import time
+from copy import deepcopy
 
 import os
 import argparse as ap  
@@ -28,15 +29,21 @@ for device in gpu_devices:
 def run_fed_server(_args, _basic_port=BASIC_PORT):
 
     # load the parameters of FL
-    _clients = _args.client_num
-    FED_MODEL = FED_MODEL_DICT[_args.model]
-    
+    c_num = _args.client_num
+    _sample_client = eval(_args.rec_sample)
+    fed_model = FED_MODEL_DICT[_args.model]
+    fed_round = _args.fed_round
+    print("Now the combination of client is ", _sample_client)
+
     # build the channel to each client to execute the local trainning.
-    ports = [c+_basic_port for c in range(_clients)]  
-    c_num = _clients 
-    channels =[ grpc.insecure_channel("localhost:"+str(ports[i])) for i in range(c_num)]
-    grad_stubs = [fed_proto_pb2_grpc.GradDescentServiceStub(channels[i]) for i in range(c_num)]
-    size_stubs = [fed_proto_pb2_grpc.GetDataSizeServiceStub(channels[i]) for i in range(c_num)]
+    ports = [c+_basic_port for c in range(c_num)]  
+    channels= []
+    for cid in range(c_num):
+        if cid in _sample_client:
+            channels.append(grpc.insecure_channel("localhost:"+str(ports[cid])))
+    grad_stubs = [fed_proto_pb2_grpc.GradDescentServiceStub(channel) for channel in channels]
+    size_stubs = [fed_proto_pb2_grpc.GetDataSizeServiceStub(channel) for channel in channels]
+
     print("# build the channel to each client to execute the local trainning.")
 
     # Loaded the test data
@@ -49,29 +56,50 @@ def run_fed_server(_args, _basic_port=BASIC_PORT):
 
     # Globally train the federated model, i.e. execute the stub.grad_decendent
     print("# Globally train the federated model, i.e. execute the stub.grad_decendent.")
-    DATA_SHAPE = FED_SHAPE_DICT[_args.dataset]
-    global_model = FED_MODEL(DATA_SHAPE[0], DATA_SHAPE[1])
+    data_shape = FED_SHAPE_DICT[_args.dataset]
+    global_model = fed_model(data_shape[0], data_shape[1])
+
+    # Check whether the subset of client is []
+    if len(_sample_client)==0:
+        test_loss, test_acc = global_model.model_get_eval(testX, testY)
+        stop_stus = fed_proto_pb2_grpc.stop_serverStub(grpc.insecure_channel("localhost:"+str(STOP_PORT)))
+        stop_stus.stop(fed_proto_pb2.stop_request(message="simplex"))
+        return test_acc, test_loss        
+
+    print("Next execute FL trainning!")
     global_model_weights = global_model.model_get_weights()
-    datasize_response = [size_stubs[c].get_datasize(fed_proto_pb2.datasize_request(size=0)) for c in range(c_num)]
+    datasize_response = [size_stubs[c].get_datasize(fed_proto_pb2.datasize_request(size=0)) for c in range(len(size_stubs))]
     np_datasize = np.array([r.size for r in datasize_response])
     all_datasize = np.sum(np_datasize)
+
     print(" ## The datasize from rpc is :", np_datasize, " ## allsize is %d"%(all_datasize))
     grad_alpha = (np_datasize/all_datasize)
-    grad_alpha = grad_alpha.reshape((grad_alpha.shape[0],1)) 
     # print(" ## grad_alpha is :", grad_alpha)
 
-    for r in range(FED_ROUND):
+    for r in range(fed_round):
         grad_data, grad_type, grad_shape = nparray_to_rpcio(global_model_weights) # data, type, shape
         rpcio_responses = [grad_stubs[c].grad_descent(
             fed_proto_pb2.server_request(server_grad_para_data=grad_data, server_grad_para_type=grad_type, 
-                                         server_grad_para_shape=grad_shape)) for c in range(c_num)]
+                                         server_grad_para_shape=grad_shape)) for c in range(len(grad_stubs))]
         print("Have got the response of weights from client.")
         responses = [rpcio_to_nparray(r.client_grad_para_data, r.client_grad_para_type, r.client_grad_para_shape) for r in rpcio_responses]
         # responses = [tf.keras.get_weights], tf.keras.get_weights --> list[layer1, layer2, layer...], layer_i --> np.array[p*q] 
 
-        responses *= grad_alpha
-        global_model_weights = list(responses.mean(axis=0))
+        #FedAVG-1
+        # grad_alpha = grad_alpha.reshape((grad_alpha.shape[0],1)) 
+        # responses *= grad_alpha
+        # global_model_weights = list(responses.mean(axis=0))
 
+        #FedAVG-2
+        # grad_alpha = (np_datasize/all_datasize)
+        temp = [np.zeros(gmw_layer.shape) for gmw_layer in global_model_weights]
+        for layers in range(len(global_model_weights)):
+            # for i in range(len(responses)):
+            for cid in range(len(responses)):
+                temp[layers] = temp[layers] + grad_alpha[cid]*responses[cid][layers]
+
+        global_model_weights = deepcopy(temp)
+        
         # for ind in range(len(global_model_weights)):
         #     # print(global_model_weights[ind].shape)
         #     if len(global_model_weights[ind].shape)==2:
@@ -87,11 +115,15 @@ def run_fed_server(_args, _basic_port=BASIC_PORT):
         # test the performance of global model.
         global_model.model_load_weights(global_model_weights)
         test_loss, test_acc = global_model.model_get_eval(testX, testY)
-        print("Round#{}#, Acc:{}, Loss:{}".format(r, test_acc, test_loss))
+        print("Subset<-{}: Round#{}#, Acc:{}, Loss:{}".format(_sample_client, r, test_acc, test_loss))
 
     
     stop_stus = fed_proto_pb2_grpc.stop_serverStub(grpc.insecure_channel("localhost:"+str(STOP_PORT)))
     stop_stus.stop(fed_proto_pb2.stop_request(message="simplex"))
+    
+    # record the loss and acc
+    test_loss, test_acc = global_model.model_get_eval(testX, testY)
+    return test_acc, test_loss
 
 if __name__ == "__main__":
     logging.basicConfig()
@@ -102,17 +134,19 @@ if __name__ == "__main__":
     parser.add_argument("--client_num", type=int, default=5)
     parser.add_argument("--dataset", type=str, default="emnist")
     parser.add_argument("--rec_sample", type=str, default=str([i for i in range(5)]))
+    parser.add_argument("--fed_round", type=int, default=5)
     args = parser.parse_args()
+
+    # waiting for the build-up of client
+    for i in range(5):
+        print("The Server is waiting for the client until %d seconds."% (5-i))
+        time.sleep(1)
 
     # run the server in FL & record the running time of FL
     begin_time = time.perf_counter()
-    run_fed_server(args)
+    acc, loss = run_fed_server(args)
     end_time = time.perf_counter()
 
 
     # record the time of this sample in FL
-    file_name_rec_grad = "./rec_fed_sample_time/" + get_rec_file_name(args.model, args.client_num, args.dataset)
-    now_rec = pk.load(file_name_rec_grad)
-    now_rec[str(power2number(args.rec_sample))] = end_time - begin_time
-    with open(file_name_rec_grad, 'wb') as fout:
-        pk.dump(now_rec, fout)
+    rec_sample_time(args, acc, loss, end_time-begin_time)

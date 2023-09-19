@@ -6,3 +6,5 @@ new_fed_shapley_scheme/datasets/emnist/*
 new_fed_shapley_scheme/datasets/figs/*
 new_fed_shapley_scheme/datasets/grad_data/*
 new_fed_shapley_scheme/datasets/sample_data/*
+new_fed_shapley_scheme/rec_fed_grad/*
+new_fed_shapley_scheme/rec_fed_sample_time/*

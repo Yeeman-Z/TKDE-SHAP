@@ -53,6 +53,7 @@ def create_dataset(name, c_num, c_type):
         
 if __name__ == "__main__":
 
+    #  example: python fed_data_creater.py --dataset='emnist' --c_num=10 --c_type='same'  
     parser = ap.ArgumentParser(description="Create Federated Dataset.")
     parser.add_argument('--dataset', type=str, default= 'emnist')
     parser.add_argument('--c_num', type=int, default=10)

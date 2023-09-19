@@ -18,14 +18,16 @@ file_client_trainY = open(data_path+'client_trainY.pk', 'rb')
 client_trainX = pk.load(file_client_trainX)
 client_trainY = pk.load(file_client_trainY)
 
-data_path = "../new_fed_shapley_scheme/datasets/emnist/client_5_same/"
+data_path = "../new_fed_shapley_scheme/datasets/emnist/client_20_same/"
 file_testX = open(data_path+'testX.pk', 'rb')
 file_testY = open(data_path+'testY.pk', 'rb')
 x_test = pk.load(file_testX)
 y_test = pk.load(file_testY)
+x_train = client_trainX[0]
+y_train = client_trainY[0]
 # client_trainX = axis=0
-x_train = np.concatenate(client_trainX, axis=0)
-y_train = np.concatenate(client_trainY, axis=0)
+# x_train = np.concatenate(client_trainX, axis=0)
+# y_train = np.concatenate(client_trainY, axis=0)
 # mnist = tf.keras.datasets.mnist
 
 # (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -65,9 +67,21 @@ print(x_train.shape, y_train.shape)
 # ])
 
 
-model = tf.keras.models.Sequential([
-            tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
-            tf.keras.layers.Conv2D(32, (8,8), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
+# model = tf.keras.models.Sequential([
+#             tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
+#             tf.keras.layers.Conv2D(32, (8,8), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
+#             tf.keras.layers.MaxPooling2D((8,8), name='Pool2D-2x2'),   # (14,14,32)
+#             # tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), #(14,14,64)
+#             # tf.keras.layers.MaxPooling2D((2,2)), #[7, 7, 64]
+#             tf.keras.layers.Flatten(), #5*5*64
+#             tf.keras.layers.Dense(16, activation='relu'),
+#             tf.keras.layers.Dense(10,)
+#         ])
+
+# 2023.9.19
+model  = tf.keras.models.Sequential([
+            tf.keras.layers.Reshape((28, 28,1), input_shape=(28, 28)),
+            tf.keras.layers.Conv2D(32, (16,16), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
             tf.keras.layers.MaxPooling2D((8,8), name='Pool2D-2x2'),   # (14,14,32)
             # tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), #(14,14,64)
             # tf.keras.layers.MaxPooling2D((2,2)), #[7, 7, 64]
@@ -75,6 +89,7 @@ model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(16, activation='relu'),
             tf.keras.layers.Dense(10,)
         ])
+
 
         # self.model.summary()
 
@@ -87,5 +102,5 @@ model.compile(optimizer='adam',
               loss=loss_fn,
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, batch_size=10200, epochs=2)
+model.fit(x_train, y_train, batch_size=16, epochs=2)
 model.evaluate(x_test,  y_test, verbose=2)

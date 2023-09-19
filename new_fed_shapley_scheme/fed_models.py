@@ -8,7 +8,7 @@ import numpy as np
 CLINT_NUM = 5
 BASIC_PORT = 50020
 STOP_PORT =  50081
-FED_ROUND = 100
+FED_ROUND = 10
 # DATA_SHAPE = 
 LOCAL_EPOCH = 5
 LOCAL_BATCH = 64
@@ -97,16 +97,29 @@ class cnn_model(basic_model):
         self.model_type = "CNN Model"
         super(cnn_model, self).__init__(self.input, self.output, self.model_type)
 
-        self.model = tf.keras.models.Sequential([
-            tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
-            tf.keras.layers.Conv2D(128, (3,3), activation='relu', padding='same', name='Conv2D-3x3'),  
-            tf.keras.layers.MaxPooling2D((2,2), name='Pool2D-2x2'),  
-            tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), 
-            tf.keras.layers.MaxPooling2D((2,2)), 
-            tf.keras.layers.Flatten(), 
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(10,)
-        ])
+        # Last Used Model
+        # self.model = tf.keras.models.Sequential([
+        #     tf.keras.layers.Reshape((self.input[0], self.input[1],1), input_shape=self.input),
+        #     tf.keras.layers.Conv2D(64, (16,16), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
+        #     tf.keras.layers.MaxPooling2D((8,8), name='Pool2D-2x2'),   # (14,14,32)
+        #     # tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), #(14,14,64)
+        #     # tf.keras.layers.MaxPooling2D((2,2)), #[7, 7, 64]
+        #     tf.keras.layers.Flatten(), #5*5*64
+        #     tf.keras.layers.Dense(32, activation='relu'),
+        #     tf.keras.layers.Dense(self.output,)
+        # ])
+
+        # self.model = tf.keras.models.Sequential([
+        #     tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
+        #     tf.keras.layers.Conv2D(128, (3,3), activation='relu', padding='same', name='Conv2D-3x3'),  
+        #     tf.keras.layers.MaxPooling2D((2,2), name='Pool2D-2x2'),  
+        #     tf.keras.layers.Conv2D(64, (2,2),padding='same', activation='relu'), 
+        #     tf.keras.layers.MaxPooling2D((2,2)), 
+        #     tf.keras.layers.Flatten(), 
+        #     tf.keras.layers.Dense(64, activation='relu'),
+        #     tf.keras.layers.Dense(10,)
+        # ])
+
         # self.model = tf.keras.models.Sequential([
         #     tf.keras.layers.Reshape((28,28,1), input_shape=(28, 28)),
         #     tf.keras.layers.Conv2D(32, (8,8), activation='relu', padding='same', name='Conv2D-3x3'),  #(28, 28, 32)
@@ -118,6 +131,28 @@ class cnn_model(basic_model):
         #     tf.keras.layers.Dense(10,)
         # ])
 
+        # # copy from github ...
+        self.model = tf.keras.Sequential([
+            # Reshape input to match the expected shape
+            tf.keras.layers.Reshape((self.input[0], self.input[1],1), input_shape=self.input),
+
+            # tf.keras.layers.Reshape((28, 28, 1), input_shape=(28, 28)),
+            
+            # First convolutional layer
+            tf.keras.layers.Conv2D(32, kernel_size=(7, 7), padding='same', activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            
+            # Second convolutional layer
+            tf.keras.layers.Conv2D(64, kernel_size=(3, 3), padding='same', activation='relu'),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            
+            # Flatten and output layer
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(self.output)
+        ])
+    
+
         self.model_compile() 
+        print("We have created a fedcnn model")
 
 FED_MODEL_DICT = {"cnn_model":cnn_model, "linear_model": linear_model}
